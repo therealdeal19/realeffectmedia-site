@@ -1,0 +1,17 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { formatDate } from "../lib/format";
+
+interface Props { post: CollectionEntry<"blog">; }
+const { post } = Astro.props;
+const { title, description, date, image, imageAlt } = post.data;
+---
+<a class="post" href={`/blog/${post.id}`}>
+  {image ? <img class="cover" src={image} alt={imageAlt} loading="lazy" width="800" height="450" /> : <span></span>}
+  <div class="post-body">
+    <p class="eyebrow">{formatDate(date)}</p>
+    <h3>{title}</h3>
+    {description && <p class="excerpt">{description}</p>}
+    <span class="more">Read the post →</span>
+  </div>
+</a>

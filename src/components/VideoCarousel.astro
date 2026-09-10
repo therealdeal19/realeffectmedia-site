@@ -1,0 +1,74 @@
+---
+import { getVideos } from "../lib/youtube";
+import { formatDate } from "../lib/format";
+import { SITE } from "../data/site";
+
+// Rendered at build time so the carousel works without JavaScript and is
+// visible to search engines. On the live site the script below also asks
+// /api/videos (functions/api/videos.js) for newer uploads.
+const videos = await getVideos(8);
+---
+<div class="channel" data-carousel>
+  <div class="sub">
+    <h3>On YouTube</h3>
+    <div class="car-btns">
+      <button class="car-btn" type="button" data-dir="-1" aria-label="Previous videos"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg></button>
+      <button class="car-btn" type="button" data-dir="1" aria-label="Next videos"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg></button>
+    </div>
+  </div>
+  <div class="carousel" data-latest={videos[0]?.id ?? ""}>
+    {videos.map((v) => (
+      <a class="vid" href={`https://www.youtube.com/watch?v=${v.id}`}>
+        <div class="shot">
+          <img src={v.thumb} alt="" loading="lazy" width="480" height="270" />
+          <span class="play"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg></span>
+        </div>
+        <span class="vt">{v.title}</span>
+        <span class="vd">{formatDate(v.published)}</span>
+      </a>
+    ))}
+    <a class="vid all" href={SITE.youtube}>
+      <div class="shot"><span>See all videos →</span></div>
+      <span class="vt">Subscribe on YouTube</span>
+      <span class="vd">@REALEFFECTMEDIA</span>
+    </a>
+  </div>
+</div>
+
+<script>
+  import { formatDate } from "../lib/format";
+
+  type Video = { id: string; title: string; published: string; thumb: string };
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const esc = (s: string) =>
+    s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
+  const card = (v: Video) =>
+    `<a class="vid" href="https://www.youtube.com/watch?v=${esc(v.id)}"><div class="shot"><img src="${esc(v.thumb)}" alt="" loading="lazy" width="480" height="270"><span class="play"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span></div><span class="vt">${esc(v.title)}</span><span class="vd">${formatDate(v.published)}</span></a>`;
+
+  let latest: Promise<Video[]> | null = null;
+  const fetchLatest = () =>
+    (latest ??= fetch("/api/videos")
+      .then((r) => (r.ok ? r.json() : { videos: [] }))
+      .then((d) => d.videos ?? [])
+      .catch(() => []));
+
+  document.querySelectorAll<HTMLElement>("[data-carousel]").forEach(async (root) => {
+    const track = root.querySelector<HTMLElement>(".carousel");
+    if (!track) return;
+
+    root.querySelectorAll<HTMLButtonElement>(".car-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const first = track.querySelector<HTMLElement>(".vid");
+        const step = first ? first.getBoundingClientRect().width + 22 : 300;
+        track.scrollBy({ left: step * Number(btn.dataset.dir), behavior: reduce ? "auto" : "smooth" });
+      });
+    });
+
+    // Swap in newer uploads if the channel has posted since this page was built
+    const videos = await fetchLatest();
+    if (!videos.length || videos[0].id === track.dataset.latest) return;
+    track.querySelectorAll(".vid:not(.all)").forEach((el) => el.remove());
+    track.querySelector(".vid.all")?.insertAdjacentHTML("beforebegin", videos.map(card).join(""));
+    track.dataset.latest = videos[0].id;
+  });
+</script>

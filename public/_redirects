@@ -1,0 +1,6 @@
+# Old Squarespace URLs -> new site (301 = permanent, keeps Google rankings)
+/home          /      301
+/footer-links  /      301
+/cart          /      301
+/favicon.ico   /favicon.svg  301
+/blog/Blog%20Post%20Title%20One-3zaa9-zlxng-xbkmm-zx56h  /blog/how-youtube-helps-real-estate-agents-in-austin-and-houston-generate-leads-in-2026  301

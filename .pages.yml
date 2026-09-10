@@ -1,0 +1,39 @@
+# Pages CMS config: the blog editor at https://app.pagescms.org
+# Log in with GitHub, open this repository, and click "Blog posts".
+media:
+  input: public/media/blog
+  output: /media/blog
+
+content:
+  - name: blog
+    label: Blog posts
+    type: collection
+    path: src/content/blog
+    filename: "{fields.title}.md"
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+      - name: description
+        label: Summary (shows on Google and on blog cards, about 150 characters)
+        type: text
+      - name: date
+        label: Publish date
+        type: date
+        required: true
+      - name: image
+        label: Featured image
+        type: image
+      - name: imageAlt
+        label: Describe the image (helps SEO and screen readers)
+        type: string
+      - name: youtube
+        label: YouTube link (optional, embeds the video at the top of the post)
+        type: string
+      - name: draft
+        label: Draft (hide from the website)
+        type: boolean
+      - name: body
+        label: Post
+        type: rich-text

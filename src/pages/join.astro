@@ -1,0 +1,71 @@
+---
+import Base from "../layouts/Base.astro";
+import { SITE } from "../data/site";
+
+const onCall = [
+  "We look up what buyers and sellers are searching in your market.",
+  "We show you where your videos could rank, and how long that usually takes.",
+  "We walk you through which of our three tiers fits your goals. No pressure.",
+];
+
+const formReady = Boolean(SITE.formAccessKey);
+const booking = SITE.bookingUrl;
+// Google Calendar appointment schedules can be embedded right on the page
+const calendarEmbed = booking.includes("calendar.google.com/calendar/appointments")
+  ? `${booking}${booking.includes("?") ? "&" : "?"}gv=true`
+  : "";
+// Show the form when it can deliver, or as the only option if nothing else is set up
+const showForm = formReady || !booking;
+---
+<Base
+  title="Book a free consultation"
+  description="Book a free 30-minute consultation with Real Effect Media. See the searches your future clients make and how we'd rank your videos for them."
+>
+  <section class="join textured">
+    <div class:list={["wrap", { stacked: calendarEmbed }]}>
+      <div class="join-intro">
+        <div>
+          <p class="eyebrow">Free 30-minute consultation</p>
+          <h1>Let's put your name at the top of the search.</h1>
+          <p class="lede">{calendarEmbed ? "Pick a time that works for you. It takes less than a minute." : "Tell us a little about your business and we'll reach out to set up a time."}</p>
+        </div>
+        <ul class="oncall">
+          {onCall.map((item) => <li><i class="mark yes" aria-hidden="true">✓</i><span>{item}</span></li>)}
+        </ul>
+        {booking && !calendarEmbed && (
+          <p><a class="btn btn-primary" href={booking}>Pick a time →</a></p>
+        )}
+      </div>
+
+      {calendarEmbed && (
+        <div class="calendar-card">
+          <iframe src={calendarEmbed} title="Book a free consultation" loading="lazy"></iframe>
+        </div>
+      )}
+
+      {showForm && (
+        <form class="form-card" action="https://api.web3forms.com/submit" method="POST">
+          <h2>{calendarEmbed ? "Prefer to send a message?" : "Request your consultation"}</h2>
+          {!formReady && import.meta.env.DEV && (
+            <p class="form-warn">Setup needed: add your Web3Forms access key in src/data/site.ts so submissions reach your inbox.</p>
+          )}
+          <input type="hidden" name="access_key" value={SITE.formAccessKey} />
+          <input type="hidden" name="subject" value="New consultation request from realeffectmedia.com" />
+          <input type="hidden" name="from_name" value="Real Effect Media website" />
+          <input type="hidden" name="redirect" value={new URL("/thanks", SITE.url).href} />
+          <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+          <div class="field-row">
+            <div class="field"><label for="first">First name</label><input id="first" name="first_name" autocomplete="given-name" required /></div>
+            <div class="field"><label for="last">Last name</label><input id="last" name="last_name" autocomplete="family-name" required /></div>
+          </div>
+          <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required /></div>
+          <div class="field"><label for="phone">Phone <span>(optional)</span></label><input id="phone" name="phone" type="tel" autocomplete="tel" /></div>
+          <div class="field"><label for="market">City or market you serve</label><input id="market" name="market" placeholder="e.g. Austin, TX" required /></div>
+          <div class="field"><label for="message">Where can we help?</label><textarea id="message" name="message" required></textarea></div>
+          <button class="btn btn-primary" type="submit">Request my consultation</button>
+          <p class="form-note">We'll reply by email within one business day.</p>
+        </form>
+      )}
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,244 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../layouts/Base.astro";
+import Cta from "../components/Cta.astro";
+import PostCard from "../components/PostCard.astro";
+import VideoCarousel from "../components/VideoCarousel.astro";
+import { FAQS } from "../data/faqs";
+import { SITE } from "../data/site";
+
+// Live search demo: each search shows one of our thumbnails ranking #1.
+const searches = [
+  { q: "is it a good time to buy in denver", img: "/media/search/denver.jpg", d: "14:32",
+    title: "Is it time to buy in Denver? What the market is telling us", by: "Your Name · Denver Realtor" },
+  { q: "moving to salt lake city pros and cons", img: "/media/search/salt-lake-city.jpg", d: "18:04",
+    title: "Moving to Salt Lake City? Watch this first", by: "Your Name · Salt Lake City Realtor" },
+  { q: "should i sell my house in palm springs", img: "/media/search/palm-springs.jpg", d: "12:37",
+    title: "Is it time to sell in Palm Springs?", by: "Your Name · Palm Springs Realtor" },
+  { q: "best neighborhoods in austin tx", img: "/media/search/austin.jpg", d: "15:21",
+    title: "The best neighborhoods in Austin, ranked", by: "Your Name · Austin Realtor" },
+];
+const first = searches[0];
+
+const checklist = [
+  "Leads are yours alone, not shared with other agents",
+  "No cost per lead",
+  "Keeps bringing leads after you stop paying",
+  "Puts your name, not a portal's, in Google results",
+  "Clients already know and trust you before the first call",
+  "Gets stronger with every video you publish",
+];
+
+const posts = (await getCollection("blog", ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 2);
+
+const homeFaqs = FAQS.filter((f) => f.home);
+
+const websiteLd = { "@context": "https://schema.org", "@type": "WebSite", name: SITE.name, url: SITE.url };
+---
+<Base title={SITE.name} jsonLd={websiteLd}>
+  <section class="hero">
+    <video class="hero-video" autoplay muted loop playsinline preload="auto" poster="/media/hero-poster.jpg" aria-hidden="true">
+      <source src="/media/hero.mp4" type="video/mp4" />
+    </video>
+    <div class="wrap">
+      <div>
+        <p class="eyebrow">YouTube + SEO for real estate agents</p>
+        <h1>Your next client is <em>searching</em> right now.</h1>
+        <p class="lede">Buyers and sellers type their questions into YouTube and Google every day. We make the videos that answer them, with your name on every one. You don't film, edit, or write anything.</p>
+        <div class="hero-ctas">
+          <a class="btn btn-primary" href="/join">Book a free 30-minute consultation</a>
+          <a class="btn btn-ghost" href="#work">See what we make</a>
+        </div>
+        <div class="hero-meta eyebrow">
+          <span>Done for you</span><span>On camera or faceless</span><span>Built to rank</span>
+        </div>
+      </div>
+
+      <div class="search" aria-label="Example: a search a future client might type" data-searches={JSON.stringify(searches)}>
+        <div class="eyebrow"><span>What your future client types</span><span class="live">Live example</span></div>
+        <div class="query">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0f120d" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+          <span class="query-text"><span data-q>{first.q}</span><span class="caret" aria-hidden="true"></span></span>
+        </div>
+        <div class="results">
+          <div class="result swap" data-top>
+            <div class="yt"><img data-img src={first.img} alt={`Example thumbnail: ${first.title}`} width="560" height="315" /><span class="dur" data-dur>{first.d}</span></div>
+            <div class="result-top">
+              <div class="title" data-title>{first.title}</div>
+              <div class="by" data-by>{first.by}</div>
+              <span class="pill">Your video · #1</span>
+            </div>
+          </div>
+          <div class="result dim" aria-hidden="true">
+            <div class="ghost"></div>
+            <div><div class="bar" style="width:90%"></div><div class="bar" style="width:55%"></div></div>
+          </div>
+          <div class="result dim" aria-hidden="true">
+            <div class="ghost"></div>
+            <div><div class="bar" style="width:80%"></div><div class="bar" style="width:40%"></div></div>
+          </div>
+        </div>
+        <p class="search-note">Every video answers a question people in your market already search, and keeps ranking long after it's published.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block why">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">Why YouTube</p>
+        <h2>Stop renting leads. Start owning them.</h2>
+        <p class="lede">Most agents skip YouTube because they think of it as entertainment. But it rewards exactly what you already have: local knowledge and real answers.</p>
+      </div>
+      <div class="checklist" role="table" aria-label="Paid portal leads compared with your own YouTube channel">
+        <div class="hl" aria-hidden="true"></div>
+        <div class="row" role="row"><span role="columnheader"></span><span class="th" role="columnheader">Paid portal leads</span><span class="th yt-col" role="columnheader">Your own<b>YouTube channel</b></span></div>
+        {checklist.map((item) => (
+          <div class="row" role="row">
+            <span role="cell">{item}</span>
+            <span role="cell"><i class="mark no" aria-label="No">✕</i></span>
+            <span role="cell"><i class="mark yes" aria-label="Yes">✓</i></span>
+          </div>
+        ))}
+      </div>
+      <div class="why-foot">
+        <a class="btn btn-primary" href="/join">See how it works in your market</a>
+        <p>The upfront investment is the content. After that, every video keeps working without a per-lead bill.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block how textured" id="how">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">How it works</p>
+        <h2>You run your business. We run your channel.</h2>
+      </div>
+      <ol class="steps">
+        <li>
+          <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m20 20-4.8-4.8" /><path d="M8 10.5h5M10.5 8v5" /></svg></span>
+          <span class="num"></span>
+          <h3>Strategy call</h3>
+          <p>We map the questions buyers and sellers in your market are searching for, and pick the ones worth ranking for.</p>
+        </li>
+        <li>
+          <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2" /><path d="m16 10 5-3v10l-5-3" /></svg></span>
+          <span class="num"></span>
+          <h3>We produce</h3>
+          <p>Scripting, editing, thumbnails and titles, all handled by us. You never touch an editing app.</p>
+        </li>
+        <li>
+          <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="3.5" /><path d="m10 9 5 3-5 3z" fill="currentColor" /></svg></span>
+          <span class="num"></span>
+          <h3>We publish &amp; optimize</h3>
+          <p>Videos go live on your channel, built to rank in both YouTube and Google search.</p>
+        </li>
+        <li>
+          <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18" /><path d="m4 15 5-5 4 3 7-7" /><path d="M15 6h5v5" /></svg></span>
+          <span class="num"></span>
+          <h3>It compounds</h3>
+          <p>Most agents see real search traffic within a few months, and it keeps growing with every video.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="block make textured" id="work">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">What we make</p>
+        <h2>On camera, or not at all.</h2>
+        <p class="lede">Camera-shy is fine. We build the format around what works for you.</p>
+      </div>
+      <div class="formats">
+        <article class="format">
+          <div class="frame"><video autoplay muted loop playsinline preload="metadata" src="/media/faceless.mp4" aria-label="Example of a faceless video"></video></div>
+          <span class="tag">No face needed</span>
+          <h3>Faceless</h3>
+          <p>Neighborhood footage, maps and on-screen text. Your expertise, without ever stepping in front of a camera.</p>
+        </article>
+        <article class="format">
+          <div class="frame"><video autoplay muted loop playsinline preload="metadata" src="/media/on-camera.mp4" aria-label="Example of an on-camera video"></video></div>
+          <span class="tag">Front and center</span>
+          <h3>On camera</h3>
+          <p>You host, we handle everything around it. Nothing builds trust faster than clients seeing you before they call.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="block fresh textured" id="fresh">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">The playbook</p>
+        <h2>Fresh from the channel &amp; the blog.</h2>
+      </div>
+      <VideoCarousel />
+      <div class="blog-part">
+        <div class="sub"><h3>On the blog</h3><a class="text-link" href="/blog">All posts →</a></div>
+        <div class="posts">
+          {posts.map((post) => <PostCard post={post} />)}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block faq-sec" id="faq">
+    <div class="wrap faq">
+      <div class="head">
+        <p class="eyebrow">FAQs</p>
+        <h2>Questions agents ask us.</h2>
+        <p><a class="text-link" href="/faqs">See all FAQs →</a></p>
+      </div>
+      <div>
+        {homeFaqs.map((f, i) => (
+          <details open={i === 0}>
+            <summary>{f.q}</summary>
+            <p>{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <Cta />
+</Base>
+
+<script>
+  type Search = { q: string; img: string; d: string; title: string; by: string };
+  const box = document.querySelector<HTMLElement>("[data-searches]");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (box && !reduce) {
+    const items: Search[] = JSON.parse(box.dataset.searches ?? "[]");
+    const $ = <T extends HTMLElement>(sel: string) => box.querySelector<T>(sel)!;
+    const q = $("[data-q]"), top = $("[data-top]"), img = $<HTMLImageElement>("[data-img]");
+    const dur = $("[data-dur]"), title = $("[data-title]"), by = $("[data-by]");
+    // Warm the cache so each swap shows instantly
+    items.forEach((it) => { new Image().src = it.img; });
+    let i = 0;
+    setInterval(() => {
+      i = (i + 1) % items.length;
+      const it = items[i];
+      let n = 0;
+      top.classList.add("out");
+      q.textContent = "";
+      const typer = setInterval(() => {
+        n++;
+        q.textContent = it.q.slice(0, n);
+        if (n >= it.q.length) {
+          clearInterval(typer);
+          setTimeout(() => {
+            img.src = it.img;
+            img.alt = `Example thumbnail: ${it.title}`;
+            dur.textContent = it.d;
+            title.textContent = it.title;
+            by.textContent = it.by;
+            top.classList.remove("out");
+          }, 350);
+        }
+      }, 55);
+    }, 6500);
+  }
+</script>

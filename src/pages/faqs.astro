@@ -1,0 +1,43 @@
+---
+import Base from "../layouts/Base.astro";
+import Cta from "../components/Cta.astro";
+import { FAQS } from "../data/faqs";
+
+const faqLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQS.map((f) => ({
+    "@type": "Question",
+    name: f.q,
+    acceptedAnswer: { "@type": "Answer", text: f.a },
+  })),
+};
+---
+<Base
+  title="FAQs"
+  description="Answers to what real estate agents ask about YouTube marketing: being on camera, cost, how long SEO takes, and how YouTube compares to Zillow leads."
+  jsonLd={faqLd}
+>
+  <section class="page-hero textured">
+    <div class="wrap">
+      <p class="eyebrow">FAQs</p>
+      <h1>Questions agents ask us.</h1>
+      <p class="lede">Straight answers about YouTube, SEO, and working with us. Don't see yours? Ask on a free consultation.</p>
+    </div>
+  </section>
+
+  <section class="list-sec faq-page">
+    <div class="wrap">
+      <div class="faq-list">
+        {FAQS.map((f, i) => (
+          <details open={i < 2}>
+            <summary>{f.q}</summary>
+            <p>{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <Cta />
+</Base>

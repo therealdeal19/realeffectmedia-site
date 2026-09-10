@@ -1,0 +1,114 @@
+---
+import "@fontsource/anton";
+import "@fontsource-variable/archivo";
+import "@fontsource/ibm-plex-mono/400.css";
+import "@fontsource/ibm-plex-mono/500.css";
+import "../styles/global.css";
+import { SITE } from "../data/site";
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  type?: "website" | "article";
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  noindex?: boolean;
+}
+
+const { title, description = SITE.description, image = "/media/og.jpg", type = "website", jsonLd, noindex = false } = Astro.props;
+const path = Astro.url.pathname.replace(/\.html$/, "").replace(/\/index$/, "/");
+const canonical = new URL(path, SITE.url).href;
+const ogImage = new URL(image, SITE.url).href;
+const fullTitle = title === SITE.name ? title : `${title} | ${SITE.name}`;
+const nav = [
+  { href: "/#how", label: "How it works" },
+  { href: "/#work", label: "Our work" },
+  { href: "/blog", label: "Blog" },
+  { href: "/faqs", label: "FAQs" },
+];
+const org = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: SITE.name,
+  url: SITE.url,
+  description: SITE.description,
+  sameAs: [SITE.youtube],
+};
+const ld = [org, ...(Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [])];
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#0f120d" />
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <script type="application/ld+json" set:html={JSON.stringify(ld)} />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="site">
+      <div class="wrap">
+        <a class="logo" href="/">REAL EFFECT MEDIA</a>
+        <nav class="main" aria-label="Main">
+          <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links">Menu</button>
+          <div class="nav-links" id="nav-links">
+            {nav.map((n) => <a href={n.href} aria-current={path === n.href ? "page" : undefined}>{n.label}</a>)}
+            <a class="nav-book" href="/join">Book a consultation →</a>
+          </div>
+          <a class="btn btn-primary" href="/join">Book a consultation</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <footer class="site">
+      <div class="wrap">
+        <a class="logo" href="/">REAL EFFECT MEDIA</a>
+        <nav aria-label="Footer">
+          <a href="/#how">How it works</a>
+          <a href="/blog">Blog</a>
+          <a href="/faqs">FAQs</a>
+          <a href="/join">Book a consultation</a>
+          <a href={SITE.youtube}>YouTube</a>
+        </nav>
+        <span>© {new Date().getFullYear()} Real Effect Media</span>
+      </div>
+    </footer>
+
+    <script>
+      const toggle = document.querySelector<HTMLButtonElement>(".menu-toggle");
+      const links = document.getElementById("nav-links");
+      toggle?.addEventListener("click", () => {
+        const open = links!.classList.toggle("open");
+        toggle.setAttribute("aria-expanded", String(open));
+        toggle.textContent = open ? "Close" : "Menu";
+      });
+      links?.addEventListener("click", (e) => {
+        if ((e.target as HTMLElement).closest("a")) {
+          links.classList.remove("open");
+          toggle?.setAttribute("aria-expanded", "false");
+          if (toggle) toggle.textContent = "Menu";
+        }
+      });
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        document.querySelectorAll("video").forEach((v) => { v.removeAttribute("autoplay"); v.pause(); });
+      }
+    </script>
+  </body>
+</html>

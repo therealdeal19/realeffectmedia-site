@@ -1,0 +1,39 @@
+# Builds the site and publishes it to Cloudflare Pages on every push to main,
+# including blog posts saved in Pages CMS.
+# Setup: add a repository secret named CLOUDFLARE_API_TOKEN
+# (Cloudflare dashboard > My Profile > API Tokens, permission: Account > Cloudflare Pages > Edit).
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Publish to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: eeccad1f34315cacc87ae19e0f074eaf
+          command: pages deploy dist --project-name realeffectmedia --branch main
