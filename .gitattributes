@@ -1,0 +1,5 @@
+# Store text files with LF line endings (GitHub and Pages CMS use LF; avoids CRLF churn on Windows)
+* text=auto eol=lf
+*.jpg binary
+*.png binary
+*.mp4 binary
