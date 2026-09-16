@@ -1,8 +1,12 @@
 ---
-title: "# How Real Estate Agents Can Get More Views on Their Videos (and Look
-  More Professional Doing It)"
+title: How Real Estate Agents Can Get More Views on Their Videos (and Look More
+  Professional Doing It)
+description: "It doesn't take much to look good on YouTube. For under 100
+  dollars, you can make solid content. Getting it optimized for your viewers is
+  a different ball game. "
 date: 2026-09-15
 image: /media/blog/header1.webp
+imageAlt: iPhone camera setup for YouTube video about real estate
 draft: false
 ---
 If you're a real estate agent posting videos and wondering why nobody's watching, you're not alone. Most agents post a walkthrough, a market update, or an "about me" video, get a handful of views, and give up thinking video just doesn't work for real estate.
